@@ -1,0 +1,56 @@
+---
+all:
+  children:
+    spines:
+      hosts:
+        spine01:
+          ansible_host: spine01
+          loopback: 10.0.0.101
+          asn: 65100
+        spine02:
+          ansible_host: spine02
+          loopback: 10.0.0.102
+          asn: 65100
+    leafs:
+      children:
+        leaf_pair1:
+          vars:
+            es_id: 1
+            es_sysmac: 44:38:39:ff:ff:01
+            es_df_preference:
+              leaf01: 1000
+              leaf02: 2000
+          hosts:
+            leaf01:
+              ansible_host: leaf01
+              loopback: 10.0.0.1
+              asn: 65101
+              es_df_pref: 1000
+            leaf02:
+              ansible_host: leaf02
+              loopback: 10.0.0.2
+              asn: 65102
+              es_df_pref: 2000
+        leaf_pair2:
+          vars:
+            es_id: 2
+            es_sysmac: 44:38:39:ff:ff:02
+            es_df_preference:
+              leaf03: 1000
+              leaf04: 2000
+          hosts:
+            leaf03:
+              ansible_host: leaf03
+              loopback: 10.0.0.3
+              asn: 65103
+              es_df_pref: 1000
+            leaf04:
+              ansible_host: leaf04
+              loopback: 10.0.0.4
+              asn: 65104
+              es_df_pref: 2000
+  vars:
+    ansible_user: cumulus
+    ansible_password: cumu1usLinux!
+    ansible_become: yes
+    ansible_become_method: sudo
