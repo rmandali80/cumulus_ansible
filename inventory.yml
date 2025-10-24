@@ -49,6 +49,29 @@ all:
               loopback: 10.0.0.4
               asn: 65104
               es_df_pref: 2000
+
+    servers:
+      children: 
+        server:
+          vars:
+            ansible_user: ubuntu
+            ansible_password: nvidia
+            ansible_become: yes
+            ansible_become_method: sudo
+          hosts:
+            server1:
+              ansible_host: server1
+              ip_address: 100.0.0.1
+            server2:
+              ansible_host: server2
+              ip_address: 100.0.0.2
+            server3:
+              ansible_host: server3
+              ip_address: 100.0.0.3
+            server4:
+              ansible_host: server4
+              ip_address: 100.0.0.4
+              
   vars:
     ansible_user: cumulus
     ansible_password: cumu1usLinux!
