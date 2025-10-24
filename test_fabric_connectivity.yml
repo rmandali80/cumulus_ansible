@@ -20,7 +20,24 @@
         msg: "✗ SSH connectivity FAILED to {{ inventory_hostname }}"
       when: ping_result is failed
 
+    - name: Test server to server reachability
+      ansible.builtin.shell: |
+        output=$(ping -c 3 -W 2 {{ hostvars[item].ip_address }} 2>&1)
+        stats=$(echo "$output" | grep "packets transmitted" | sed -n 's/.*\([0-9]\+\) packets transmitted.*\([0-9]\+\) received.*/\1\/\2/p')
+        echo "${stats:-0/0}"
+      loop: "{{ groups['servers'] }}"
+      register: server_to_server_ping
+      when: "'servers' in group_names"
+      ignore_errors: yes
+      changed_when: false
 
+    - name: Display server to server connectivity
+      ansible.builtin.debug:
+        msg: "Ping from {{ inventory_hostname }} ({{ ip_address }}) -> to {{ item.item }} ({{ hostvars[item.item].ip_address }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
+      loop: "{{ server_to_server_ping.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: "'servers' in group_names and server_to_server_ping.results is defined"
 
     - name: Test loopback reachability between leafs
       ansible.builtin.shell: |
