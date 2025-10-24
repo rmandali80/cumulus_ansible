@@ -33,25 +33,13 @@
       ignore_errors: yes
       changed_when: false
 
-    - name: Display spine to leaf connectivity
+    - name: Display leaf to leaf connectivity
       ansible.builtin.debug:
-        msg: "{{ inventory_hostname }} -> {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
+        msg: "Ping from {{ inventory_hostname }} ({{ loopback }}) -> to {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
       loop: "{{ leaf_to_leaf_ping.results }}"
       loop_control:
         label: "{{ item.item }}"
       when: "'leafs' in group_names and leaf_to_leaf_ping.results is defined"
-
-    - name: Test loopback reachability between leafs
-      ansible.builtin.shell: |
-        output=$(ping -c 3 -W 2 {{ hostvars[item].loopback }} 2>&1)
-        stats=$(echo "$output" | grep "packets transmitted" | sed -n 's/.*\([0-9]\+\) packets transmitted.*\([0-9]\+\) received.*/\1\/\2/p')
-        echo "${stats:-0/0}"
-      loop: "{{ groups['leafs'] }}"
-      register: leaf_to_spine_ping
-      when: "'leafs' in group_names"
-      ignore_errors: yes
-      changed_when: false
-
 
 - name: Test Network Connectivity Between Fabric Devices
   hosts: all
@@ -72,7 +60,7 @@
 
     - name: Display spine to leaf connectivity
       ansible.builtin.debug:
-        msg: "{{ inventory_hostname }} -> {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
+        msg: "Ping from {{ inventory_hostname }} ({{ loopback }}) -> To {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
       loop: "{{ spine_to_leaf_ping.results }}"
       loop_control:
         label: "{{ item.item }}"
@@ -91,7 +79,7 @@
 
     - name: Display leaf to spine connectivity
       ansible.builtin.debug:
-        msg: "{{ inventory_hostname }} -> {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
+        msg: "Ping from {{ inventory_hostname }} ({{ loopback }}) -> To {{ item.item }} ({{ hostvars[item.item].loopback }}): {{ '✓' if item.rc == 0 else '✗' }} [Tx/Rx: {{ item.stdout | trim }}]"
       loop: "{{ leaf_to_spine_ping.results }}"
       loop_control:
         label: "{{ item.item }}"
